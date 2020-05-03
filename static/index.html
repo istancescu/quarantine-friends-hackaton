@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Golang Chatting App</title>
+  </head>
+  <body></body>
+  <form action=""></form>
+  <h2>Set your username:</h2>
+  <input id="username" autocomplete="off" /><button>Send</button>
+  <h2>Enter your text below:</h2>
+  <form action="">
+    <input id="m" autocomplete="off" /><button>Send</button>
+  </form>
+  <ul id="messages" class="messages"></ul>
+  <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+  <script>
+    const socket = io();
+    var s2 = io("/chat");
+    let lsUsername = localStorage.getItem("username");
+
+    $("#username").val(lsUsername);
+    socket.on("reply", (msg) => {
+      console.log(msg);
+      $("#messages").append($("<li>").text(msg));
+    });
+
+    $("form").submit(function () {
+      let username = $("#username").val() || lsUsername;
+      let msg = $("#m").val();
+      const finalMsg = `${username}: ${msg}`;
+
+      localStorage.setItem("username", username);
+
+      s2.emit("msg", finalMsg, (data) => {});
+      socket.emit("notice", finalMsg);
+      $("#m").val("");
+      return false;
+    });
+  </script>
+
+  <style>
+    .messages {
+      list-style: none;
+      font-size: 2.6rem;
+      color: #535353;
+      font-family: sans-serif;
+      padding-left: 0;
+    }
+  </style>
+</html>
